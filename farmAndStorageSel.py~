@@ -1,0 +1,78 @@
+import csv
+import re
+from matplotlib import pyplot
+
+roadSideCoord = []
+#putting the coordinates into a dictionary of storages
+with open('RoadSideStorage.csv', 'rb') as csvfile:
+    roadsideCoordReader = csv.reader(csvfile, delimiter=',', quotechar='|')
+    headers = next(roadsideCoordReader, None)
+    rowNum = 0;
+    for row in  roadsideCoordReader:
+      roadSideCoord.append((str(rowNum) ,(float(row[0]),float(row[1]))))
+      rowNum+=1
+
+roadSideCoord = dict(roadSideCoord)
+
+
+
+#reading the output of the optimization problem
+file_ = open("./IISDopt.csv","r")
+variables_all = file_.readlines() #variable containing sol
+
+farmToStorage = []
+farmToStorageAmt = []
+satellite = set()
+roadSide = set()
+roadSideToSatellite = set()
+#print variables_all
+for line in variables_all:
+    cropType =  re.search("RouteStore_f_([0-9]+)_c_([0-9]+)_s_([0-9]+)_t_([0-9]+)",line)
+      #print line
+    if cropType:
+      print cropType.groups()
+      routeTuple = cropType.groups()
+      if routeTuple[0] == routeTuple[2]:
+          if routeTuple[2] not in satellite:
+            roadSide.add(roadSideCoord[routeTuple[2]])
+      elif  routeTuple[0] != routeTuple[2]:
+        roadSideToSatellite.add(roadSideCoord[routeTuple[0]])
+        satellite.add(roadSideCoord[routeTuple[2]])
+        if  roadSideCoord[routeTuple[2]] in roadSide:
+          roadSide.remove(roadSideCoord[routeTuple[2]])
+          
+        
+      
+      farmToStorage.append(cropType.groups())
+      amountTrnsported = re.split("\s+",line)
+      #print amountTrnsported[1]
+      farmToStorageAmt.append(amountTrnsported[1])
+
+roadSide = roadSide.difference(satellite)
+roadSideToSatellite = roadSideToSatellite.difference(satellite)
+#print list(roadSide)
+#print list(satellite)
+
+xRoadside = [x for (x,y) in list(roadSide)]
+yRoadside  = [y for (x,y) in list(roadSide)]
+
+xSatellite = [x for (x,y) in list(satellite)]
+ySatellite  = [y for (x,y) in list(satellite)]
+
+xroadToSat = [x for (x,y) in list(roadSideToSatellite)]
+yroadToSat = [y for (x,y) in list(roadSideToSatellite)]
+
+pyplot.scatter(xRoadside, yRoadside, s=20, c=u'b', marker=u'o', label='Roadside storages')
+pyplot.hold
+pyplot.scatter(xSatellite, ySatellite, s=20, c=u'k', marker=u'^', label='Satellite storages')
+pyplot.scatter(xroadToSat, yroadToSat, s=50, c=u'r', marker=u's', label='Roadside to Satellite')
+legend = pyplot.legend(loc='best', shadow=True, fontsize='x-large')
+
+# Put a nicer background color on the legend.
+legend.get_frame().set_facecolor('#00FFCC')
+
+
+pyplot.show()
+
+
+      
