@@ -1,3 +1,5 @@
 # TRTechBioFuelRouting
 Solution to a logistic problem of collecting crop residue and delivering them at the bio-fuel plant
 This project was carried out to develop a biomass resource assessment tool, which is applied to the combined problem of estimating the resource potential of conventional and unconventional feedstocks within Manitoba and of developing an optimized plan for the harvest, storage and transportation of the feedstock. My part in this project was to place the roadside storages and assign farms to those storages in such a way that the transport, logistics and wastage costs are minimized. This optimization problem was a mixed integer linear program which takes a long time to solve. Then my self and the lead scientist at TRTech developed heuristics to minimize the time taken to calculate the number and the placement of these roadside storages. All the coding was done in Python. In order to derive the unit transportation costs we used certain formulas from the literature and had to modify some of them to simplify the cost model.
+
+For additional information look at the .pdf file IISD optimization problem3.pdf.
